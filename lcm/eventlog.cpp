@@ -13,7 +13,7 @@
 
 #define MAGIC ((int32_t) 0xEDA1DA01L)
 
-lcm_eventlog_t *lcm_eventlog_create(const char *path, const char *mode)
+extern "C" lcm_eventlog_t *lcm_eventlog_create(const char *path, const char *mode)
 {
     assert(!strcmp(mode, "r") || !strcmp(mode, "w") || !strcmp(mode, "a"));
     if (*mode == 'w')
@@ -38,14 +38,14 @@ lcm_eventlog_t *lcm_eventlog_create(const char *path, const char *mode)
     return l;
 }
 
-void lcm_eventlog_destroy(lcm_eventlog_t *l)
+extern "C" void lcm_eventlog_destroy(lcm_eventlog_t *l)
 {
     fflush(l->f);
     fclose(l->f);
     free(l);
 }
 
-lcm_eventlog_event_t *lcm_eventlog_read_next_event(lcm_eventlog_t *l)
+extern "C" lcm_eventlog_event_t *lcm_eventlog_read_next_event(lcm_eventlog_t *l)
 {
     lcm_eventlog_event_t *le = (lcm_eventlog_event_t *) calloc(1, sizeof(lcm_eventlog_event_t));
 
@@ -110,7 +110,7 @@ lcm_eventlog_event_t *lcm_eventlog_read_next_event(lcm_eventlog_t *l)
     return le;
 }
 
-int lcm_eventlog_write_event(lcm_eventlog_t *l, lcm_eventlog_event_t *le)
+extern "C" int lcm_eventlog_write_event(lcm_eventlog_t *l, lcm_eventlog_event_t *le)
 {
     if (0 != fwrite32(l->f, MAGIC))
         return -1;
@@ -136,7 +136,7 @@ int lcm_eventlog_write_event(lcm_eventlog_t *l, lcm_eventlog_event_t *le)
     return 0;
 }
 
-void lcm_eventlog_free_event(lcm_eventlog_event_t *le)
+extern "C" void lcm_eventlog_free_event(lcm_eventlog_event_t *le)
 {
     if (le->data)
         free(le->data);
@@ -174,7 +174,7 @@ eof:
     return -1;
 }
 
-int lcm_eventlog_seek_to_timestamp(lcm_eventlog_t *l, int64_t timestamp)
+extern "C" int lcm_eventlog_seek_to_timestamp(lcm_eventlog_t *l, int64_t timestamp)
 {
     fseeko(l->f, 0, SEEK_END);
     off_t file_len = ftello(l->f);

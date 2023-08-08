@@ -3,8 +3,8 @@ if(UNIX)
 endif()
 
 set(lcm_sources
-  eventlog.c
-  lcm.c
+  eventlog.cpp
+  lcm.cpp
   lcm_file.c
   lcm_memq.c
   lcm_mpudpm.c

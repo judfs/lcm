@@ -48,13 +48,13 @@ struct _lcm_subscription_t {
     int num_queued_messages;
 };
 
-extern void lcm_udpm_provider_init(GPtrArray *providers);
-extern void lcm_logprov_provider_init(GPtrArray *providers);
-extern void lcm_tcpq_provider_init(GPtrArray *providers);
-extern void lcm_mpudpm_provider_init(GPtrArray *providers);
-extern void lcm_memq_provider_init(GPtrArray *providers);
+extern "C" void lcm_udpm_provider_init(GPtrArray *providers);
+extern "C" void lcm_logprov_provider_init(GPtrArray *providers);
+extern "C" void lcm_tcpq_provider_init(GPtrArray *providers);
+extern "C" void lcm_mpudpm_provider_init(GPtrArray *providers);
+extern "C" void lcm_memq_provider_init(GPtrArray *providers);
 
-lcm_t *lcm_create(const char *url)
+extern "C" lcm_t *lcm_create(const char *url)
 {
 #ifdef WIN32
     WSADATA wsd;
@@ -69,6 +69,9 @@ lcm_t *lcm_create(const char *url)
     GHashTable *args = g_hash_table_new_full(g_str_hash, g_str_equal, free, free);
     GPtrArray *providers = g_ptr_array_new();
     lcm_t *lcm = NULL;
+
+    lcm_provider_info_t *info = NULL;
+
 
     // initialize the list of providers
     lcm_udpm_provider_init(providers);
@@ -91,7 +94,6 @@ lcm_t *lcm_create(const char *url)
         goto fail;
     }
 
-    lcm_provider_info_t *info = NULL;
     /* Find a matching provider */
     for (unsigned int i = 0; i < providers->len; i++) {
         lcm_provider_info_t *pinfo = (lcm_provider_info_t *) g_ptr_array_index(providers, i);
@@ -166,7 +168,7 @@ static void lcm_handler_free(lcm_subscription_t *h)
     free(h);
 }
 
-void lcm_destroy(lcm_t *lcm)
+extern "C" void lcm_destroy(lcm_t *lcm)
 {
     if (lcm->provider) {
         for (unsigned int i = 0; i < lcm->handlers_all->len; i++) {
@@ -194,7 +196,7 @@ void lcm_destroy(lcm_t *lcm)
 #endif
 }
 
-int lcm_handle(lcm_t *lcm)
+extern "C" int lcm_handle(lcm_t *lcm)
 {
     if (lcm->provider && lcm->vtable->handle) {
         int ret;
@@ -209,7 +211,7 @@ int lcm_handle(lcm_t *lcm)
         return -1;
 }
 
-int lcm_handle_timeout(lcm_t *lcm, int timeout_milis)
+extern "C" int lcm_handle_timeout(lcm_t *lcm, int timeout_milis)
 {
     fd_set fds;
     FD_ZERO(&fds);
@@ -235,7 +237,7 @@ int lcm_handle_timeout(lcm_t *lcm, int timeout_milis)
     }
 }
 
-int lcm_get_fileno(lcm_t *lcm)
+extern "C" int lcm_get_fileno(lcm_t *lcm)
 {
     if (lcm->provider && lcm->vtable->get_fileno)
         return lcm->vtable->get_fileno(lcm->provider);
@@ -243,7 +245,7 @@ int lcm_get_fileno(lcm_t *lcm)
         return -1;
 }
 
-int lcm_publish(lcm_t *lcm, const char *channel, const void *data, unsigned int datalen)
+extern "C" int lcm_publish(lcm_t *lcm, const char *channel, const void *data, unsigned int datalen)
 {
     if (lcm->provider && lcm->vtable->publish)
         return lcm->vtable->publish(lcm->provider, channel, data, datalen);
@@ -278,7 +280,7 @@ static void map_remove_handler_callback(gpointer _key, gpointer _value, gpointer
     g_ptr_array_remove_fast(handlers, h);
 }
 
-lcm_subscription_t *lcm_subscribe(lcm_t *lcm, const char *channel, lcm_msg_handler_t handler,
+extern "C" lcm_subscription_t *lcm_subscribe(lcm_t *lcm, const char *channel, lcm_msg_handler_t handler,
                                   void *userdata)
 {
     dbg(DBG_LCM, "registering %s handler %p\n", channel, handler);
@@ -319,7 +321,7 @@ lcm_subscription_t *lcm_subscribe(lcm_t *lcm, const char *channel, lcm_msg_handl
     return h;
 }
 
-int lcm_unsubscribe(lcm_t *lcm, lcm_subscription_t *h)
+extern "C" int lcm_unsubscribe(lcm_t *lcm, lcm_subscription_t *h)
 {
     g_rec_mutex_lock(&lcm->mutex);
 
@@ -346,7 +348,7 @@ int lcm_unsubscribe(lcm_t *lcm, lcm_subscription_t *h)
 
 /* ==== Internal API for Providers ==== */
 
-GPtrArray *lcm_get_handlers(lcm_t *lcm, const char *channel)
+extern "C" GPtrArray *lcm_get_handlers(lcm_t *lcm, const char *channel)
 {
     g_rec_mutex_lock(&lcm->mutex);
     GPtrArray *handlers = (GPtrArray *) g_hash_table_lookup(lcm->handlers_map, channel);
@@ -371,7 +373,7 @@ finished:
     return handlers;
 }
 
-int lcm_try_enqueue_message(lcm_t *lcm, const char *channel)
+extern "C" int lcm_try_enqueue_message(lcm_t *lcm, const char *channel)
 {
     g_rec_mutex_lock(&lcm->mutex);
     GPtrArray *handlers = lcm_get_handlers(lcm, channel);
@@ -388,7 +390,7 @@ int lcm_try_enqueue_message(lcm_t *lcm, const char *channel)
     return num_keepers > 0;
 }
 
-int lcm_has_handlers(lcm_t *lcm, const char *channel)
+extern "C" int lcm_has_handlers(lcm_t *lcm, const char *channel)
 {
     int has_handlers = 1;
     g_rec_mutex_lock(&lcm->mutex);
@@ -399,7 +401,7 @@ int lcm_has_handlers(lcm_t *lcm, const char *channel)
     return has_handlers;
 }
 
-int lcm_dispatch_handlers(lcm_t *lcm, lcm_recv_buf_t *buf, const char *channel)
+extern "C" int lcm_dispatch_handlers(lcm_t *lcm, lcm_recv_buf_t *buf, const char *channel)
 {
     g_rec_mutex_lock(&lcm->mutex);
 
@@ -447,7 +449,7 @@ int lcm_dispatch_handlers(lcm_t *lcm, lcm_recv_buf_t *buf, const char *channel)
     return 0;
 }
 
-int lcm_parse_url(const char *url, char **provider, char **network, GHashTable *args)
+extern "C" int lcm_parse_url(const char *url, char **provider, char **network, GHashTable *args)
 {
     if (!url || !strlen(url))
         return -1;
@@ -491,7 +493,7 @@ int lcm_parse_url(const char *url, char **provider, char **network, GHashTable *
     return 0;
 }
 
-int lcm_subscription_set_queue_capacity(lcm_subscription_t *subs, int num_messages)
+extern "C" int lcm_subscription_set_queue_capacity(lcm_subscription_t *subs, int num_messages)
 {
     g_rec_mutex_lock(&subs->lcm->mutex);
     subs->max_num_queued_messages = num_messages;
@@ -499,7 +501,7 @@ int lcm_subscription_set_queue_capacity(lcm_subscription_t *subs, int num_messag
     return 0;
 }
 
-int lcm_subscription_get_queue_size(lcm_subscription_t *subs)
+extern "C" int lcm_subscription_get_queue_size(lcm_subscription_t *subs)
 {
     g_rec_mutex_lock(&subs->lcm->mutex);
     int result = subs->num_queued_messages;

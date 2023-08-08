@@ -26,6 +26,10 @@
 #define lcm_internal_pipe_create pipe
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct _lcm_provider_t lcm_provider_t;
 typedef struct _lcm_provider_info_t lcm_provider_info_t;
 typedef struct _lcm_provider_vtable_t lcm_provider_vtable_t;
@@ -57,5 +61,9 @@ int lcm_try_enqueue_message(lcm_t *lcm, const char *channel);
 int lcm_has_handlers(lcm_t *lcm, const char *channel);
 
 int lcm_dispatch_handlers(lcm_t *lcm, lcm_recv_buf_t *buf, const char *channel);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

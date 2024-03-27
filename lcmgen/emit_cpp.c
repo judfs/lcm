@@ -793,6 +793,7 @@ static void emit_decode_nohash(lcmgen_t *lcm, FILE *f, lcm_struct_t *ls)
 
 int emit_cpp(lcmgen_t *lcmgen)
 {
+    printf("Writing C++ package to:\n\t%s\n", getopt_get_string(lcmgen->gopt, "cpp-hpath"));
     // iterate through all defined message types
     for (unsigned int i = 0; i < g_ptr_array_size(lcmgen->structs); i++) {
         lcm_struct_t *lr = (lcm_struct_t *) g_ptr_array_index(lcmgen->structs, i);
@@ -802,8 +803,10 @@ int emit_cpp(lcmgen_t *lcmgen)
 
         // compute the target filename
         char *header_name = g_strdup_printf(
-            "%s%s%s.hpp", getopt_get_string(lcmgen->gopt, "cpp-hpath"),
-            strlen(getopt_get_string(lcmgen->gopt, "cpp-hpath")) > 0 ? G_DIR_SEPARATOR_S : "", tn_);
+            "%s%s%s.hpp",                                                                       //
+            getopt_get_string(lcmgen->gopt, "cpp-hpath"),                                       //
+            strlen(getopt_get_string(lcmgen->gopt, "cpp-hpath")) > 0 ? G_DIR_SEPARATOR_S : "",  //
+            tn_);
 
         // generate code if needed
         if (lcm_needs_generation(lcmgen, lr->lcmfile, header_name)) {

@@ -736,6 +736,7 @@ emit_package (lcmgen_t *lcm, _package_contents_t *package)
             return -1;
         }
     }
+    printf("Writing python package to: \n\t%s\n", package_dir);
 
     // write the package __init__.py files, if necessary
     FILE *init_py_fp = NULL;

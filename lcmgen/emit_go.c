@@ -1542,6 +1542,8 @@ void setup_go_options(getopt_t *gopt)
 
 int emit_go(lcmgen_t *lcm)
 {
+    printf("Writing go package to:\n\t%s\n", getopt_get_string(lcm->gopt, "go-path"));
+
     int res = 0;
 
     GString *gopath = g_string_new(getopt_get_string(lcm->gopt, "go-path"));

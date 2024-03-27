@@ -336,6 +336,8 @@ void copy_recursive(lcmgen_t *lcm, lcm_member_t *lm, FILE *f, primitive_info_t *
 
 int emit_java(lcmgen_t *lcm)
 {
+    printf("Writing java package to:\n\t%s\n", getopt_get_string(lcm->gopt, "jpath"));
+
     GHashTable *type_table = g_hash_table_new(g_str_hash, g_str_equal);
 
     g_hash_table_insert(type_table, "byte",

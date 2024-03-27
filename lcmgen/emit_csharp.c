@@ -176,6 +176,8 @@ static const char *dim_size_prefix(const char *dim_size)
 
 int emit_csharp(lcmgen_t *lcm)
 {
+    printf("Writing C# package to:\n\t%s\n", getopt_get_string(lcm->gopt, "csharp-path"));
+
     GHashTable *type_table = g_hash_table_new(g_str_hash, g_str_equal);
 
     g_hash_table_insert(type_table, "byte", prim("byte", "# = ins.ReadByte();", "outs.Write(#);"));

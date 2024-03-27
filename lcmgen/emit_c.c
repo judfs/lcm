@@ -1279,6 +1279,8 @@ int emit_struct(lcmgen_t *lcmgen, lcm_struct_t *structure)
 
 int emit_c(lcmgen_t *lcmgen)
 {
+    printf("Writing C package to:\n\t%s\n\t%s\n", getopt_get_string(lcmgen->gopt, "c-hpath"),
+           getopt_get_string(lcmgen->gopt, "c-cpath"));
     ////////////////////////////////////////////////////////////
     // ENUMS
     for (unsigned int i = 0; i < g_ptr_array_size(lcmgen->enums); i++) {

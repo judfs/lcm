@@ -1117,6 +1117,8 @@ static int emit_package(lcmgen_t *lcm, _package_contents_t *pc)
 // XXX step 1, but there's not much to see, then go to emit package
 int emit_lua(lcmgen_t *lcm)
 {
+    printf("Writing lua package to:\n\t%s\n", getopt_get_string(lcm->gopt, "lpath"));
+
     GHashTable *packages = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
                                                  (GDestroyNotify) _package_contents_free);
 
